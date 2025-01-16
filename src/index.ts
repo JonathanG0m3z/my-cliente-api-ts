@@ -1,10 +1,10 @@
-import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+import express from 'express';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
 
 // Variables de entorno
-dotenv.config();
 const { URL_FRONT, PORT = 3001 } = process.env;
 
 const app = express();
@@ -17,6 +17,10 @@ const corOptions: CorsOptions = {
 app.use(cors(corOptions));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
+
+// Routes
+const userRouter = require('./routes/userRouter');
+app.use('/users', userRouter);
 
 app.use(express.json());
 
