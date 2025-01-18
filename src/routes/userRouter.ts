@@ -5,3 +5,5 @@ import { getBalanceById } from '../controllers/userController';
 const router = express.Router();
 
 router.get('/getBalance', verifyToken, getBalanceById);
+
+export default router;

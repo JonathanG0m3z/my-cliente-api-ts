@@ -14,11 +14,12 @@ interface DecodedToken extends JwtPayload {
     email: string;
 }
 
-export const verifyToken = (req: PersonalRequest, _: Response, next: NextFunction): void => {
+export const verifyToken = (req: PersonalRequest, res: Response, next: NextFunction): void => {
     const encryptedToken = req.headers.authorization;
 
     if (!encryptedToken) {
-        throw new Error('No se proporcionó un token de autenticación');
+        res.status(401).json({ message: 'No se proporcionó un token de autenticación' });
+        return;
     }
 
     const token = decryptValue(encryptedToken);
@@ -28,7 +29,8 @@ export const verifyToken = (req: PersonalRequest, _: Response, next: NextFunctio
         const currentTimestamp = Math.floor(Date.now() / 1000);
 
         if (decodedToken.exp && decodedToken.exp < currentTimestamp) {
-            throw new Error('Token de autenticación expirado');
+            res.status(401).json({ message: 'Token de autenticación expirado' });
+            return;
         }
 
         // Verificar la firma del token
@@ -41,6 +43,6 @@ export const verifyToken = (req: PersonalRequest, _: Response, next: NextFunctio
         // Continuar con el siguiente middleware
         next();
     } catch (err: any) {
-        throw new Error(err.message);
+        res.status(401).json({ message: err.message });
     }
 };

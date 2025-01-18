@@ -79,7 +79,7 @@ export default (sequelize: Sequelize) => {
         },
         {
             sequelize,
-            modelName: 'User',
+            modelName: 'user',
         }
     );
 

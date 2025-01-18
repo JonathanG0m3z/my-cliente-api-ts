@@ -3,6 +3,7 @@ dotenv.config();
 import express from 'express';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
+import userRouter from './routes/userRouter';
 
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
@@ -19,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
 // Routes
-const userRouter = require('./routes/userRouter');
+
 app.use('/users', userRouter);
 
 app.use(express.json());
