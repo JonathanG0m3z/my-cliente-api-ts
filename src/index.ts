@@ -4,6 +4,7 @@ import express from 'express';
 import cors, { CorsOptions } from 'cors';
 import bodyParser from 'body-parser';
 import userRouter from './routes/userRouter';
+import serviceRouter from './routes/serviceRouter';
 
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
@@ -22,6 +23,7 @@ app.use(bodyParser.json({ limit: '50mb' }));
 // Routes
 
 app.use('/users', userRouter);
+app.use('/services', serviceRouter);
 
 app.use(express.json());
 

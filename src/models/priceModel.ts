@@ -1,22 +1,22 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 
-// Define los atributos del modelo
+
 interface PriceAttributes {
     id: string;
     price: number;
     userId: string;
-    // serviceId: string;
+    serviceId: string;
 }
 
-// Define los atributos opcionales para la creación de instancias
+
 interface PriceCreationAttributes extends Optional<PriceAttributes, 'id'> { }
 
-// Define el modelo extendiendo de `Model`
+
 class Price extends Model<PriceAttributes, PriceCreationAttributes> implements PriceAttributes {
     public id!: string;
     public price!: number;
     public userId!: string;
-    // public serviceId!: string;
+    public serviceId!: string;
 }
 
 export default (sequelize: Sequelize): typeof Price => {
@@ -35,10 +35,10 @@ export default (sequelize: Sequelize): typeof Price => {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
-            // serviceId: {
-            //     type: DataTypes.UUID,
-            //     allowNull: false,
-            // },
+            serviceId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+            },
         },
         {
             sequelize,
