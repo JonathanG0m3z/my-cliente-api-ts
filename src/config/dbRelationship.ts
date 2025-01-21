@@ -13,15 +13,15 @@ interface RelationsParams {
 const relations = ({ 
     user, 
     // account, 
-    // client, 
+    client,
     price, 
     // sale, 
-    // service, 
-    // sharedBoard 
+    service,
+    sharedBoard
 }: RelationsParams): void => {
     /* PRICE RELATIONS */
-    // service.hasMany(price, { foreignKey: 'serviceId' });
-    // price.belongsTo(service, { foreignKey: 'serviceId' });
+    service.hasMany(price, { foreignKey: 'serviceId' });
+    price.belongsTo(service, { foreignKey: 'serviceId' });
 
     user.hasMany(price, { foreignKey: 'userId' });
     price.belongsTo(user, { foreignKey: 'userId' });
@@ -44,19 +44,19 @@ const relations = ({
     // sale.belongsTo(client, { foreignKey: 'clientId' });
 
     // /* CLIENT RELATIONS */
-    // user.hasMany(client, { foreignKey: 'userId' });
-    // client.belongsTo(user, { foreignKey: 'userId' });
+    user.hasMany(client, { foreignKey: 'userId' });
+    client.belongsTo(user, { foreignKey: 'userId' });
 
     // /* SERVICE RELATIONS */
-    // user.hasMany(service, { foreignKey: 'userId' });
-    // service.belongsTo(user, { foreignKey: 'userId' });
+    user.hasMany(service, { foreignKey: 'userId' });
+    service.belongsTo(user, { foreignKey: 'userId' });
 
     // /* SHARED BOARD RELATIONS */
     // sharedBoard.hasMany(account, { foreignKey: 'sharedBoardId' });
     // account.belongsTo(sharedBoard, { foreignKey: 'sharedBoardId' });
 
-    // user.hasMany(sharedBoard, { foreignKey: 'userId' });
-    // sharedBoard.belongsTo(user, { foreignKey: 'userId' });
+    user.hasMany(sharedBoard, { foreignKey: 'userId' });
+    sharedBoard.belongsTo(user, { foreignKey: 'userId' });
 };
 
 export default relations;
