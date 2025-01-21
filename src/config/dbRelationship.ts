@@ -10,9 +10,9 @@ interface RelationsParams {
     sharedBoard: ModelStatic<Model>;
 }
 
-const relations = ({ 
+const relations = ({
     user, 
-    // account, 
+    account,
     client,
     price, 
     // sale, 
@@ -27,11 +27,11 @@ const relations = ({
     price.belongsTo(user, { foreignKey: 'userId' });
 
     // /* ACCOUNT RELATIONS */
-    // service.hasMany(account, { foreignKey: 'serviceId' });
-    // account.belongsTo(service, { foreignKey: 'serviceId' });
+    service.hasMany(account, { foreignKey: 'serviceId' });
+    account.belongsTo(service, { foreignKey: 'serviceId' });
 
-    // user.hasMany(account, { foreignKey: 'userId' });
-    // account.belongsTo(user, { foreignKey: 'userId' });
+    user.hasMany(account, { foreignKey: 'userId' });
+    account.belongsTo(user, { foreignKey: 'userId' });
 
     // /* SALE RELATIONS */
     // account.hasMany(sale, { foreignKey: 'accountId' });
@@ -52,8 +52,8 @@ const relations = ({
     service.belongsTo(user, { foreignKey: 'userId' });
 
     // /* SHARED BOARD RELATIONS */
-    // sharedBoard.hasMany(account, { foreignKey: 'sharedBoardId' });
-    // account.belongsTo(sharedBoard, { foreignKey: 'sharedBoardId' });
+    sharedBoard.hasMany(account, { foreignKey: 'sharedBoardId' });
+    account.belongsTo(sharedBoard, { foreignKey: 'sharedBoardId' });
 
     user.hasMany(sharedBoard, { foreignKey: 'userId' });
     sharedBoard.belongsTo(user, { foreignKey: 'userId' });

@@ -26,7 +26,7 @@ interface DbInterface {
     Sequelize: typeof Sequelize;
     sequelize: Sequelize;
     User: ReturnType<typeof import('../models/userModel').default>;
-    // Account: ReturnType<typeof import('../models/accountModel').default>;
+    Account: ReturnType<typeof import('../models/accountModel').default>;
     Client: ReturnType<typeof import('../models/clientModel').default>;
     Price: ReturnType<typeof import('../models/priceModel').default>;
     // Sale: ReturnType<typeof import('../models/saleModel').default>;
@@ -41,7 +41,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.User = require('../models/userModel').default(sequelize, Sequelize);
-// db.Account = require('../models/accountModel').default(sequelize, Sequelize);
+db.Account = require('../models/accountModel').default(sequelize, Sequelize);
 db.Client = require('../models/clientModel').default(sequelize, Sequelize);
 db.Price = require('../models/priceModel').default(sequelize, Sequelize);
 // db.Sale = require('../models/saleModel').default(sequelize, Sequelize);

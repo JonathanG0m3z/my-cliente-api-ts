@@ -11,6 +11,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const userRouter_1 = __importDefault(require("./routes/userRouter"));
 const serviceRouter_1 = __importDefault(require("./routes/serviceRouter"));
 const clientRouter_1 = __importDefault(require("./routes/clientRouter"));
+const sharedBoardRouter_1 = __importDefault(require("./routes/sharedBoardRouter"));
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
 const app = (0, express_1.default)();
@@ -25,6 +26,7 @@ app.use(body_parser_1.default.json({ limit: '50mb' }));
 app.use('/users', userRouter_1.default);
 app.use('/services', serviceRouter_1.default);
 app.use('/clients', clientRouter_1.default);
+app.use('/sharedBoards', sharedBoardRouter_1.default);
 app.use(express_1.default.json());
 app.get('/ping', (_, res) => {
     res.send('pong');
