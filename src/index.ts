@@ -7,6 +7,7 @@ import userRouter from './routes/userRouter';
 import serviceRouter from './routes/serviceRouter';
 import clientRouter from './routes/clientRouter';
 import sharedBoardRouter from './routes/sharedBoardRouter';
+import accountRouter from './routes/accountRouter';
 
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
@@ -28,6 +29,7 @@ app.use('/users', userRouter);
 app.use('/services', serviceRouter);
 app.use('/clients', clientRouter);
 app.use('/sharedBoards', sharedBoardRouter);
+app.use('/accounts', accountRouter);
 
 app.use(express.json());
 

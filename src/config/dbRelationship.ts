@@ -11,11 +11,11 @@ interface RelationsParams {
 }
 
 const relations = ({
-    user, 
+    user,
     account,
     client,
-    price, 
-    // sale, 
+    price,
+    sale,
     service,
     sharedBoard
 }: RelationsParams): void => {
@@ -34,14 +34,14 @@ const relations = ({
     account.belongsTo(user, { foreignKey: 'userId' });
 
     // /* SALE RELATIONS */
-    // account.hasMany(sale, { foreignKey: 'accountId' });
-    // sale.belongsTo(account, { foreignKey: 'accountId' });
+    account.hasMany(sale, { foreignKey: 'accountId' });
+    sale.belongsTo(account, { foreignKey: 'accountId' });
 
-    // user.hasMany(sale, { foreignKey: 'userId' });
-    // sale.belongsTo(user, { foreignKey: 'userId' });
+    user.hasMany(sale, { foreignKey: 'userId' });
+    sale.belongsTo(user, { foreignKey: 'userId' });
 
-    // client.hasMany(sale, { foreignKey: 'clientId' });
-    // sale.belongsTo(client, { foreignKey: 'clientId' });
+    client.hasMany(sale, { foreignKey: 'clientId' });
+    sale.belongsTo(client, { foreignKey: 'clientId' });
 
     // /* CLIENT RELATIONS */
     user.hasMany(client, { foreignKey: 'userId' });
