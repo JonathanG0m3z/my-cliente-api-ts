@@ -13,6 +13,7 @@ const serviceRouter_1 = __importDefault(require("./routes/serviceRouter"));
 const clientRouter_1 = __importDefault(require("./routes/clientRouter"));
 const sharedBoardRouter_1 = __importDefault(require("./routes/sharedBoardRouter"));
 const accountRouter_1 = __importDefault(require("./routes/accountRouter"));
+const saleRouter_1 = __importDefault(require("./routes/saleRouter"));
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
 const app = (0, express_1.default)();
@@ -29,6 +30,7 @@ app.use('/services', serviceRouter_1.default);
 app.use('/clients', clientRouter_1.default);
 app.use('/sharedBoards', sharedBoardRouter_1.default);
 app.use('/accounts', accountRouter_1.default);
+app.use('/sales', saleRouter_1.default);
 app.use(express_1.default.json());
 app.get('/ping', (_, res) => {
     res.send('pong');
