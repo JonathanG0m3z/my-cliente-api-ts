@@ -31,7 +31,7 @@ interface DbInterface {
     Price: ReturnType<typeof import('../models/priceModel').default>;
     Sale: ReturnType<typeof import('../models/saleModel').default>;
     Service: ReturnType<typeof import('../models/serviceModel').default>;
-    // ReminderLog: ReturnType<typeof import('../models/reminderLogModel').default>;
+    ReminderLog: ReturnType<typeof import('../models/reminderLogModel').default>;
     SharedBoard: ReturnType<typeof import('../models/sharedBoardModel').default>;
 }
 
@@ -46,7 +46,7 @@ db.Client = require('../models/clientModel').default(sequelize, Sequelize);
 db.Price = require('../models/priceModel').default(sequelize, Sequelize);
 db.Sale = require('../models/saleModel').default(sequelize, Sequelize);
 db.Service = require('../models/serviceModel').default(sequelize, Sequelize);
-// db.ReminderLog = require('../models/reminderLogModel').default(sequelize, Sequelize);
+db.ReminderLog = require('../models/reminderLogModel').default(sequelize, Sequelize);
 db.SharedBoard = require('../models/sharedBoardModel').default(sequelize, Sequelize);
 relations(sequelize.models as any);
 
