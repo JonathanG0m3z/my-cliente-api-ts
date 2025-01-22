@@ -6,7 +6,7 @@ interface AccountAttributes {
     password: string;
     expiration: string;
     profiles: number;
-    status?: boolean | null;
+    status?: string | null;
     createdInStore?: boolean | null;
     deleted_at?: string | null;
     serviceId: string;
@@ -24,7 +24,7 @@ export default (sequelize: Sequelize) => {
         public password!: string;
         public expiration!: string;
         public profiles!: number;
-        public status?: boolean | null;
+        public status?: string | null;
         public createdInStore?: boolean | null;
         public sharedBoardId?: string | null;
         public extras?: object | null;

@@ -32,7 +32,7 @@ db.Client = require('../models/clientModel').default(sequelize, sequelize_1.Sequ
 db.Price = require('../models/priceModel').default(sequelize, sequelize_1.Sequelize);
 db.Sale = require('../models/saleModel').default(sequelize, sequelize_1.Sequelize);
 db.Service = require('../models/serviceModel').default(sequelize, sequelize_1.Sequelize);
-// db.ReminderLog = require('../models/reminderLogModel').default(sequelize, Sequelize);
+db.ReminderLog = require('../models/reminderLogModel').default(sequelize, sequelize_1.Sequelize);
 db.SharedBoard = require('../models/sharedBoardModel').default(sequelize, sequelize_1.Sequelize);
 (0, dbRelationship_1.default)(sequelize.models);
 (_a = db.sequelize) === null || _a === void 0 ? void 0 : _a.sync({ alter: true }).then(() => {
