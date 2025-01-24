@@ -10,6 +10,8 @@ import sharedBoardRouter from './routes/sharedBoardRouter';
 import accountRouter from './routes/accountRouter';
 import saleRouter from './routes/saleRouter';
 import botRouter from './routes/botRouter';
+import { initCronJobs } from './config/cronJobs';
+import { transporter } from './config/mailer';
 
 // Variables de entorno
 const { URL_FRONT, PORT = 3001 } = process.env;
@@ -37,10 +39,12 @@ app.use('/bots', botRouter);
 
 app.use(express.json());
 
-app.get('/ping', (_, res) => {
-    res.send('pong');
-});
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+transporter.verify()
+    .then(() => console.log('Listo para enviar correos'))
+    .catch((err) => console.log(err))
+
+initCronJobs();
