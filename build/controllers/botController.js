@@ -80,7 +80,7 @@ const createIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0,
     const maxDebt = Number((_b = (_a = userData.permission) === null || _a === void 0 ? void 0 : _a.maxDebt) !== null && _b !== void 0 ? _b : 0);
     const price = iptvPremiunPriceByMonths[months];
     const newBalance = userData.balance - (price - (price * discount / 100));
-    if (price && (newBalance < maxDebt)) {
+    if (price && !demo && (newBalance < maxDebt)) {
         res.status(400).json({ message: 'DEUDA MÁXIMA ALCANZADA' });
         return;
     }
