@@ -8,6 +8,7 @@ interface RelationsParams {
     sale: ModelStatic<Model>;
     service: ModelStatic<Model>;
     sharedBoard: ModelStatic<Model>;
+    botExecution: ModelStatic<Model>;
 }
 
 const relations = ({
@@ -17,7 +18,8 @@ const relations = ({
     price,
     sale,
     service,
-    sharedBoard
+    sharedBoard,
+    botExecution
 }: RelationsParams): void => {
     /* PRICE RELATIONS */
     service.hasMany(price, { foreignKey: 'serviceId' });
@@ -57,6 +59,13 @@ const relations = ({
 
     user.hasMany(sharedBoard, { foreignKey: 'userId' });
     sharedBoard.belongsTo(user, { foreignKey: 'userId' });
+
+    /** BOT EXECUTION RELATIONS */
+    account.hasMany(botExecution, { foreignKey: 'accountId' });
+    botExecution.belongsTo(account, { foreignKey: 'accountId' });
+
+    user.hasMany(botExecution, { foreignKey: 'userId' });
+    botExecution.belongsTo(user, { foreignKey: 'userId' });
 };
 
 export default relations;

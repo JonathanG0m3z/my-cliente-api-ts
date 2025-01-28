@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const relations = ({ user, account, client, price, sale, service, sharedBoard }) => {
+const relations = ({ user, account, client, price, sale, service, sharedBoard, botExecution }) => {
     /* PRICE RELATIONS */
     service.hasMany(price, { foreignKey: 'serviceId' });
     price.belongsTo(service, { foreignKey: 'serviceId' });
@@ -29,5 +29,10 @@ const relations = ({ user, account, client, price, sale, service, sharedBoard })
     account.belongsTo(sharedBoard, { foreignKey: 'sharedBoardId' });
     user.hasMany(sharedBoard, { foreignKey: 'userId' });
     sharedBoard.belongsTo(user, { foreignKey: 'userId' });
+    /** BOT EXECUTION RELATIONS */
+    account.hasMany(botExecution, { foreignKey: 'accountId' });
+    botExecution.belongsTo(account, { foreignKey: 'accountId' });
+    user.hasMany(botExecution, { foreignKey: 'userId' });
+    botExecution.belongsTo(user, { foreignKey: 'userId' });
 };
 exports.default = relations;
