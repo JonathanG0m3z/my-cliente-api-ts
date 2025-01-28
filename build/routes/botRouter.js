@@ -7,7 +7,6 @@ const express_1 = __importDefault(require("express"));
 const jwtMiddleware_1 = require("../middlewares/jwtMiddleware");
 const botController_1 = require("../controllers/botController");
 const router = express_1.default.Router();
-router.post('/lattv', jwtMiddleware_1.verifyToken, botController_1.createLattvAccount);
 router.post('/iptvPremiun', jwtMiddleware_1.verifyToken, botController_1.createIptvPremiunAccount);
 router.post('/iptvPremiun/renew', jwtMiddleware_1.verifyToken, botController_1.renewIptvPremiunAccount);
 exports.default = router;

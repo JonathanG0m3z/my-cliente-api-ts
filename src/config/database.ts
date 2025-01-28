@@ -33,6 +33,7 @@ interface DbInterface {
     Service: ReturnType<typeof import('../models/serviceModel').default>;
     ReminderLog: ReturnType<typeof import('../models/reminderLogModel').default>;
     SharedBoard: ReturnType<typeof import('../models/sharedBoardModel').default>;
+    BotExecution: ReturnType<typeof import('../models/botExecutionModel').default>;
 }
 
 const db: Partial<DbInterface> = {};
@@ -48,6 +49,7 @@ db.Sale = require('../models/saleModel').default(sequelize, Sequelize);
 db.Service = require('../models/serviceModel').default(sequelize, Sequelize);
 db.ReminderLog = require('../models/reminderLogModel').default(sequelize, Sequelize);
 db.SharedBoard = require('../models/sharedBoardModel').default(sequelize, Sequelize);
+db.BotExecution = require('../models/botExecutionModel').default(sequelize, Sequelize);
 relations(sequelize.models as any);
 
 db.sequelize
