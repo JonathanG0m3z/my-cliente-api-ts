@@ -1,14 +1,17 @@
-// import cron from 'node-cron';
+import cron from 'node-cron';
 // import { sendEmailReminder } from '../controllers/cronJobsController';
 
+const { URL_BOTS } = process.env;
+
 export function initCronJobs() {
-    // cron.schedule('4 17 * * *', () => {
-    //     sendEmailReminder()
-    //         .then(() => {
-    //             console.log('Cron job executed successfully');
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error executing cron job:', error);
-    //         })
-    // });
+    cron.schedule('* * * * *', async () => {
+        const request = await fetch(`${URL_BOTS}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        const response = await request.json();
+        console.log(response);
+    });
 }

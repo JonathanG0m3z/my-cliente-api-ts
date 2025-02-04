@@ -56,13 +56,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
             },
             body
         })
-        await Account.update({
-            extras: {request}
-        }, { where: { id: newAccount.id } });
         const response = await request.json()
-        await Account.update({
-            extras: {request, response}
-        }, { where: { id: newAccount.id } });
         if (request.ok) {
             if (!demo) {
                 await User.update({
@@ -84,7 +78,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
     } catch (err: any) {
         await BotExecution.update({
             status: "ERROR",
-            response: { error: true, response: { message: err.message, stack: err.stack}, err }
+            response: { error: true, response: { message: err.message, stack: err.stack} }
         }, { where: { id: newBotExecution.id } });
         await Account.update({
             status: "ERROR",
