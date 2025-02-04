@@ -41,10 +41,12 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
         userId,
         createdInStore: true
     });
+    const body = JSON.stringify({ ...req.body, password: pass });
     const newBotExecution = await BotExecution.create({
         userId,
         status: "PROCESO",
-        accountId: newAccount.id
+        accountId: newAccount.id,
+        params: { body }
     })
     try {
         const request = await fetch(`${URL_BOTS}/iptvPremiun`, {
@@ -52,7 +54,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ ...req.body, password: pass })
+            body
         })
         const response = await request.json()
         if (request.ok) {
@@ -99,23 +101,25 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
         return
     }
     const accountId = decryptValue(account_id)
+    const account = await Account.findByPk(accountId);
+    const body = JSON.stringify({ username: account?.email, months, demo });
     const newBotExecution = await BotExecution.create({
         userId,
         status: "PROCESO",
-        accountId
+        accountId,
+        params: { body }
     })
 try {
     await Account.update({
         status: "RENOVANDO",
     }, { where: { id: accountId } })
-    const account = await Account.findByPk(accountId);
     if (!account) throw new Error('Cuenta no encontrada');
     const request = await fetch(`${URL_BOTS}/iptvPremiun/renew`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: account?.email, months, demo })
+        body
     })
     const response = await request.json()
     if (request.ok) {
