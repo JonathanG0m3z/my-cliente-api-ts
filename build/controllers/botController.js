@@ -21,6 +21,7 @@ const { URL_BOTS, IPTV_DISCOUNT } = process.env;
 const discount = Number(IPTV_DISCOUNT !== null && IPTV_DISCOUNT !== void 0 ? IPTV_DISCOUNT : 0);
 const iptvPremiunPriceByMonths = {
     1: 2,
+    1.5: 2,
     2: 4,
     3: 4.5,
     6: 8,
@@ -52,10 +53,12 @@ const createIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0,
         userId,
         createdInStore: true
     });
+    const body = JSON.stringify(Object.assign(Object.assign({}, req.body), { password: pass }));
     const newBotExecution = yield BotExecution.create({
         userId,
         status: "PROCESO",
-        accountId: newAccount.id
+        accountId: newAccount.id,
+        params: { body }
     });
     try {
         const request = yield fetch(`${URL_BOTS}/iptvPremiun`, {
@@ -63,9 +66,11 @@ const createIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0,
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(Object.assign(Object.assign({}, req.body), { password: pass }))
+            body
         });
+        console.log('request:', request);
         const response = yield request.json();
+        console.log('response:', response);
         if (request.ok) {
             if (!demo) {
                 yield User.update({
@@ -87,6 +92,7 @@ const createIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0,
         }
     }
     catch (err) {
+        console.log('err:', err);
         yield BotExecution.update({
             status: "ERROR",
             response: { error: true, response: { message: err.message, stack: err.stack } }
@@ -114,16 +120,18 @@ const renewIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0, 
         return;
     }
     const accountId = (0, cryptoHooks_1.decryptValue)(account_id);
+    const account = yield Account.findByPk(accountId);
+    const body = JSON.stringify({ username: account === null || account === void 0 ? void 0 : account.email, months, demo });
     const newBotExecution = yield BotExecution.create({
         userId,
         status: "PROCESO",
-        accountId
+        accountId,
+        params: { body }
     });
     try {
         yield Account.update({
             status: "RENOVANDO",
         }, { where: { id: accountId } });
-        const account = yield Account.findByPk(accountId);
         if (!account)
             throw new Error('Cuenta no encontrada');
         const request = yield fetch(`${URL_BOTS}/iptvPremiun/renew`, {
@@ -131,7 +139,7 @@ const renewIptvPremiunAccount = (req, res) => __awaiter(void 0, void 0, void 0, 
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username: account === null || account === void 0 ? void 0 : account.email, months, demo })
+            body
         });
         const response = yield request.json();
         if (request.ok) {

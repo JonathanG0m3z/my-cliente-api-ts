@@ -18,6 +18,10 @@ exports.default = (sequelize) => {
             type: sequelize_1.DataTypes.JSONB,
             allowNull: true,
         },
+        params: {
+            type: sequelize_1.DataTypes.JSONB,
+            allowNull: true,
+        },
         accountId: {
             type: sequelize_1.DataTypes.UUID,
             allowNull: true,
