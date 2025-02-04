@@ -10,6 +10,7 @@ const discount = Number(IPTV_DISCOUNT ?? 0);
 
 const iptvPremiunPriceByMonths: { [key: number]: number } = {
     1: 2,
+    1.5: 2,
     2: 4,
     3: 4.5,
     6: 8,
