@@ -122,13 +122,19 @@ export const getAccountsCombo = async (req: PersonalRequest, res: Response) => {
 
 export const getAccountById = async (req: PersonalRequest, res: Response) => {
     try {
-        const userId = req.query.userId as string;
+        const { userId } = req;
         if(!userId) throw new Error('Falta información');
         const { id } = req.params;
-        const isValid = await Account.findAll({ where: { userId, id } });
-        if (!isValid) throw Error("AccountId doesn't exist");
-        const account = await Account.findByPk(id);
-        res.status(200).json(account);
+        const account = await Account.findByPk(id, {
+            include: [
+                { model: Service, attributes: ['name'] }
+            ]
+        });
+        if (!account) throw Error("AccountId doesn't exist");
+        res.status(200).json({
+            ...account.dataValues,
+            password: encryptValue(account.dataValues.password)
+        });
     } catch (err: any) {
         res.status(400).json({ message: err.message });
     }

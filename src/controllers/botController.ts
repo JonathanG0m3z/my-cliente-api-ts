@@ -4,7 +4,7 @@ import db from "../config/database";
 import { decryptValue } from "../utils/cryptoHooks";
 import moment from "moment";
 
-const { Account, User, BotExecution } = db;
+const { Account, User, BotExecution, Service } = db;
 const { URL_BOTS, IPTV_DISCOUNT } = process.env;
 const discount = Number(IPTV_DISCOUNT ?? 0);
 
@@ -21,11 +21,11 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
     const { userId } = req;
     const { username, password, demo, months } = req.body;
     const userData: any = await User.findByPk(userId);
-    if(!userData || !userId) throw new Error('Falta información');
+    if (!userData || !userId) throw new Error('Falta información');
     const maxDebt = Number(userData.permission?.maxDebt ?? 0);
     const price = iptvPremiunPriceByMonths[months]
     const newBalance = userData.balance - (price - (price * discount / 100))
-    if(price && !demo && (newBalance < maxDebt)) {
+    if (price && !demo && (newBalance < maxDebt)) {
         res.status(400).json({ message: 'DEUDA MÁXIMA ALCANZADA' });
         return
     }
@@ -78,7 +78,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
     } catch (err: any) {
         await BotExecution.update({
             status: "ERROR",
-            response: { error: true, response: { message: err.message, stack: err.stack} }
+            response: { error: true, response: { message: err.message, stack: err.stack } }
         }, { where: { id: newBotExecution.id } });
         await Account.update({
             status: "ERROR",
@@ -92,11 +92,11 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
     const { userId } = req;
     const { months, account_id, demo } = req.body;
     const userData: any = await User.findByPk(userId);
-    if(!userData || !userId) throw new Error('Falta información');
+    if (!userData || !userId) throw new Error('Falta información');
     const maxDebt = Number(userData.permission?.maxDebt ?? 0);
     const price = iptvPremiunPriceByMonths[months]
     const newBalance = userData.balance - (price - (price * discount / 100))
-    if(price && (newBalance < maxDebt)) {
+    if (price && (newBalance < maxDebt)) {
         res.status(400).json({ message: 'DEUDA MÁXIMA ALCANZADA' });
         return
     }
@@ -109,45 +109,72 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
         accountId,
         params: { body }
     })
-try {
-    await Account.update({
-        status: "RENOVANDO",
-    }, { where: { id: accountId } })
-    if (!account) throw new Error('Cuenta no encontrada');
-    const request = await fetch(`${URL_BOTS}/iptvPremiun/renew`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body
-    })
-    const response = await request.json()
-    if (request.ok) {
-        if (!demo) {
-            await User.update({
-                balance: userData.balance - (price - (price * discount / 100))
-            }, { where: { id: userId } });
-        }
+    try {
         await Account.update({
-            status: "ACTIVA",
-            expiration: moment(account.expiration).add(months, 'months').format('YYYY-MM-DD')
-        }, { where: { id: accountId } });
+            status: "RENOVANDO",
+        }, { where: { id: accountId } })
+        if (!account) throw new Error('Cuenta no encontrada');
+        const request = await fetch(`${URL_BOTS}/iptvPremiun/renew`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body
+        })
+        const response = await request.json()
+        if (request.ok) {
+            if (!demo) {
+                await User.update({
+                    balance: userData.balance - (price - (price * discount / 100))
+                }, { where: { id: userId } });
+            }
+            await Account.update({
+                status: "ACTIVA",
+                expiration: moment(account.expiration).add(months, 'months').format('YYYY-MM-DD')
+            }, { where: { id: accountId } });
+            await BotExecution.update({
+                status: "RENOVADA",
+                response: { error: false, response }
+            }, { where: { id: newBotExecution.id } });
+            res.status(200).json(response);
+        } else {
+            throw new Error(response.error || response.message)
+        }
+    } catch (err: any) {
         await BotExecution.update({
-            status: "RENOVADA",
-            response: { error: false, response }
+            status: "ERROR",
+            response: { error: true, response: { message: err.message, stack: err.stack } }
         }, { where: { id: newBotExecution.id } });
-        res.status(200).json(response);
-    } else {
-        throw new Error(response.error || response.message)
+        await Account.update({
+            status: "ERROR",
+        }, { where: { id: accountId } });
+        res.status(400).json({ message: err.message });
     }
-} catch (err: any) {
-    await BotExecution.update({
-        status: "ERROR",
-        response: { error: true, response: { message: err.message, stack: err.stack } }
-    }, { where: { id: newBotExecution.id } });
-    await Account.update({
-        status: "ERROR",
-    }, { where: { id: accountId } });
-    res.status(400).json({ message: err.message });
-}
+};
+
+export const getBotExecutions = async (req: PersonalRequest, res: Response) => {
+    try {
+        const { userId } = req;
+        const { page = 1, limit = 10 } = req.query;
+        const offset = (Number(page) - 1) * Number(limit);
+        const botExecutions = await BotExecution.findAndCountAll({
+            where: { userId },
+            include: [
+                {
+                    model: Account,
+                    attributes: ['email'],
+                    include: [{ model: Service, attributes: ['name'] }]
+                }
+            ],
+            limit: Number(limit),
+            offset: Number(offset),
+            order: [['createdAt', 'DESC']]
+        });
+        res.status(200).json({
+            total: botExecutions.count,
+            botExecutions: botExecutions.rows
+        });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
 };
