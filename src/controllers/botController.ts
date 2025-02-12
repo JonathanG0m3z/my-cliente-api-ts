@@ -3,6 +3,7 @@ import { PersonalRequest } from "../interface/Request";
 import db from "../config/database";
 import { decryptValue } from "../utils/cryptoHooks";
 import moment from "moment";
+import { isAdmin } from "../utils/isAdmin";
 
 const { Account, User, BotExecution, Service } = db;
 const { URL_BOTS, IPTV_DISCOUNT } = process.env;
@@ -158,12 +159,16 @@ export const getBotExecutions = async (req: PersonalRequest, res: Response) => {
         const { page = 1, limit = 10 } = req.query;
         const offset = (Number(page) - 1) * Number(limit);
         const botExecutions = await BotExecution.findAndCountAll({
-            where: { userId },
+            where: { ...isAdmin(userId ?? '') ? {} :  {userId} },
             include: [
                 {
                     model: Account,
                     attributes: ['email'],
                     include: [{ model: Service, attributes: ['name'] }]
+                },
+                {
+                    model: User,
+                    attributes: ['name']
                 }
             ],
             limit: Number(limit),
