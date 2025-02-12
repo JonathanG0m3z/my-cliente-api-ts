@@ -168,7 +168,7 @@ export const getBotExecutions = async (req: PersonalRequest, res: Response) => {
                 },
                 {
                     model: User,
-                    attributes: ['name']
+                    attributes: ['name', 'picture']
                 }
             ],
             limit: Number(limit),
