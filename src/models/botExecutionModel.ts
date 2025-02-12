@@ -7,9 +7,12 @@ interface BotExecutionAttributes {
     params?: object | null;
     accountId?: string | null;
     userId: string;
+
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
-interface BotExecutionCreationAttributes extends Optional<BotExecutionAttributes, 'id' | 'response' | 'accountId' | 'params'> { }
+interface BotExecutionCreationAttributes extends Optional<BotExecutionAttributes, 'id' | 'response' | 'accountId' | 'params' | 'createdAt' | 'updatedAt'> { }
 
 export default (sequelize: Sequelize) => {
     class BotExecution extends Model<BotExecutionAttributes, BotExecutionCreationAttributes> implements BotExecutionAttributes {

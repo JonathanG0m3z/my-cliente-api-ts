@@ -4,6 +4,7 @@ import db from "../config/database";
 import { decryptValue } from "../utils/cryptoHooks";
 import moment from "moment";
 import { isAdmin } from "../utils/isAdmin";
+import { Op } from "sequelize";
 
 const { Account, User, BotExecution, Service } = db;
 const { URL_BOTS, IPTV_DISCOUNT } = process.env;
@@ -28,6 +29,13 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
     const newBalance = userData.balance - (price - (price * discount / 100))
     if (price && !demo && (newBalance < maxDebt)) {
         res.status(400).json({ message: 'DEUDA MÁXIMA ALCANZADA' });
+        return
+    }
+    const executionsInProcess = await BotExecution.findAll({
+        where: { status: "PROCESO", userId, createdAt: { [Op.gte]: moment().subtract(5, 'minutes') } }
+    })
+    if (executionsInProcess.length > 0) {
+        res.status(400).json({ message: 'Tiene ejecuciones en proceso' });
         return
     }
     const pass = decryptValue(password)
@@ -101,6 +109,13 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
         res.status(400).json({ message: 'DEUDA MÁXIMA ALCANZADA' });
         return
     }
+    const executionsInProcess = await BotExecution.findAll({
+        where: { status: "PROCESO", userId, createdAt: { [Op.gte]: moment().subtract(5, 'minutes') } }
+    })
+    if (executionsInProcess.length > 0) {
+        res.status(400).json({ message: 'Tiene ejecuciones en proceso' });
+        return
+    }
     const accountId = decryptValue(account_id)
     const account = await Account.findByPk(accountId);
     const body = JSON.stringify({ username: account?.email, months, demo });
@@ -159,7 +174,7 @@ export const getBotExecutions = async (req: PersonalRequest, res: Response) => {
         const { page = 1, limit = 10 } = req.query;
         const offset = (Number(page) - 1) * Number(limit);
         const botExecutions = await BotExecution.findAndCountAll({
-            where: { ...isAdmin(userId ?? '') ? {} :  {userId} },
+            where: { ...isAdmin(userId ?? '') ? {} : { userId } },
             include: [
                 {
                     model: Account,
