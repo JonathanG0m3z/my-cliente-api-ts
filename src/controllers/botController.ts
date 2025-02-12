@@ -87,7 +87,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
     } catch (err: any) {
         await BotExecution.update({
             status: "ERROR",
-            response: { error: true, response: { message: err.message, stack: err.stack } }
+            response: { response: { message: err.message, stack: err.stack } }
         }, { where: { id: newBotExecution.id } });
         await Account.update({
             status: "ERROR",
@@ -146,11 +146,11 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
             }
             await Account.update({
                 status: "ACTIVA",
-                expiration: moment(account.expiration).add(months, 'months').format('YYYY-MM-DD')
+                expiration: moment(response?.exp).format('YYYY-MM-DD')
             }, { where: { id: accountId } });
             await BotExecution.update({
                 status: "RENOVADA",
-                response: { error: false, response }
+                response
             }, { where: { id: newBotExecution.id } });
             res.status(200).json(response);
         } else {
@@ -159,7 +159,7 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
     } catch (err: any) {
         await BotExecution.update({
             status: "ERROR",
-            response: { error: true, response: { message: err.message, stack: err.stack } }
+            response: { message: err.message, stack: err.stack }
         }, { where: { id: newBotExecution.id } });
         await Account.update({
             status: "ERROR",
