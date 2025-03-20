@@ -135,7 +135,7 @@ export const getAccounts = async (req: PersonalRequest, res: Response) => {
             }
         });
         if (!doIHaveAccess) throw new Error('No tienes acceso a este tablero compartido');
-        const { page = 1, limit = 10, search = '', is_deleted, end_date, begin_date } = req.query;
+        const { page = 1, limit = 10, search = '', is_deleted, end_date, begin_date, service } = req.query;
         const order = req.query.order as any;
         const offset = (Number(page) - 1) * Number(limit);
 
@@ -164,6 +164,13 @@ export const getAccounts = async (req: PersonalRequest, res: Response) => {
         } else if (begin_date) {
             whereClause.expiration = {
                 [Op.gte]: begin_date
+            };
+        }
+
+        if (service && typeof service === 'string') {
+            const services = service.split(',');
+            whereClause.serviceId = {
+                [Op.in]: services
             };
         }
 
