@@ -11,7 +11,7 @@ const { URL_BOTS, IPTV_DISCOUNT } = process.env;
 const discount = Number(IPTV_DISCOUNT ?? 0);
 
 const iptvPremiunPriceByMonths: { [key: number]: number } = {
-    1: 1.5,
+    1: 1.75,
     // 1.5: 1.5,
     2: 2.75,
     3: 3.5,
