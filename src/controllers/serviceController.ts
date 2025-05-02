@@ -2,6 +2,7 @@ import { Response } from "express";
 import { PersonalRequest } from "../interface/Request";
 import { Op } from 'sequelize';
 import db from "../config/database";
+import moment from "moment";
 
 const { Service } = db;
 
@@ -16,7 +17,8 @@ export const getServices = async (req: PersonalRequest, res: Response) => {
                 [Op.or]: [
                     { userId: null },
                     { userId: userId }
-                ]
+                ],
+                deleted_at: { [Op.is]: null }
             },
             order: [['name', 'ASC']],
             limit: Number(limit),
@@ -39,7 +41,8 @@ export const getServicesCombo = async (req: PersonalRequest, res: Response) => {
             [Op.or]: [
                 { userId: null },
                 { userId: userId }
-            ]
+            ],
+            deleted_at: { [Op.is]: null }
         };
         if (search) {
             whereCondition.name = {
@@ -102,7 +105,7 @@ export const deleteService = async (req: PersonalRequest, res: Response) => {
         const {id} = req.params;
         const isValid = await Service.findByPk(id);
         if(!isValid) throw Error("El servicio no existe");
-        await Service.destroy({ where: { id, userId } });
+        await Service.update({ deleted_at: moment().format('YYYY-MM-DD HH:mm:ss') }, {where: {id, userId}});
         res.status(200).json({message: "Servicio eliminado correctamente"});
     } catch (err: any) {
         res.status(400).json({message: err.message});
