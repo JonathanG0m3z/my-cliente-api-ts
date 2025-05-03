@@ -100,15 +100,38 @@ export const addAccount = async (req: PersonalRequest, res: Response) => {
 
 export const getAccountsCombo = async (req: PersonalRequest, res: Response) => {
     try {
-        const { userId } = req;
+        const { userId, email } = req;
         const { search = '', page = 1, limit = 5 } = req.query;
+        const boards = await SharedBoard.findAll({
+            where: {
+                [Op.or]: [
+                    { userId: userId },
+                    {
+                        users: {
+                            [Op.contains]: {
+                                [`${email}`]: ['VER']
+                            }
+                        }
+                    }
+                ],
+                deleted_at: { [Op.is]: null }
+            }
+        });
+        const myBoradsIds =boards.map((board) => board.dataValues.id);
         const whereCondition: any = {
-            userId,
+            [Op.or]: [
+                { userId: userId },
+                {
+                    sharedBoardId: {
+                        [Op.in]: myBoradsIds
+                    }
+                }
+            ],
             expiration: {
                 [Op.gte]: moment().subtract(3, 'days')
             },
             deleted_at: { [Op.is]: null },
-            sharedBoardId: { [Op.is]: null }
+            // sharedBoardId: { [Op.is]: null }
         };
         if (search) {
             whereCondition.email = {
