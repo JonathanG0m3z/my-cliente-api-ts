@@ -5,21 +5,44 @@ import db from "../config/database";
 import { decryptValue, encryptValue } from "../utils/cryptoHooks";
 import moment from "moment";
 
-const { Sale, Account, Service } = db;
+const { Sale, Account, Service, SharedBoard } = db;
 
 export const getAccounts = async (req: PersonalRequest, res: Response) => {
     try {
-        const { userId } = req;
+        const { userId, email } = req;
         const currentDate = moment().subtract(5, 'days').format('YYYY-MM-DD'); // Obtener la fecha actual
         const { page = 1, limit = 10 } = req.query; // Establecer valores predeterminados para la página y el límite
         const offset = (Number(page) - 1) * Number(limit); // Calcular el desplazamiento basado en la página y el límite
 
+        const boards = await SharedBoard.findAll({
+            where: {
+                [Op.or]: [
+                    { userId: userId },
+                    {
+                        users: {
+                            [Op.contains]: {
+                                [`${email}`]: ['VER']
+                            }
+                        }
+                    }
+                ],
+                deleted_at: { [Op.is]: null }
+            }
+        });
+        const myBoradsIds =boards.map((board) => board.dataValues.id);
+
         const accounts = await Account.findAndCountAll({
             where: {
-                userId,
+                [Op.or]: [
+                    { userId: userId },
+                    {
+                        sharedBoardId: {
+                            [Op.in]: myBoradsIds
+                        }
+                    }
+                ],
                 expiration: { [Op.gte]: currentDate },
-                deleted_at: { [Op.is]: null },
-                sharedBoardId: { [Op.is]: null }
+                deleted_at: { [Op.is]: null }
             },
             include: [
                 {
