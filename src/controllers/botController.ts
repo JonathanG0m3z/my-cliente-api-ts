@@ -70,7 +70,7 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
         })
         res.status(200).json({ message: 'Bot lanzado correctamente' });
     } catch (err: any) {
-        await createAccountErrorProcess(newBotExecution.id, newAccount.id ?? '', { response: { message: err.message, stack: err.stack } });
+        await createAccountErrorProcess(newBotExecution.id, newAccount.id ?? '', { error: err.message, stack: err.stack });
         res.status(400).json({ message: err.message });
     }
 };
@@ -119,7 +119,7 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
         });
         res.status(200).json({ message: 'Bot lanzado correctamente' });
     } catch (err: any) {
-        await renewAccountErrorProcess(newBotExecution.id, accountId ?? '', { response: { message: err.message, stack: err.stack } });
+        await renewAccountErrorProcess(newBotExecution.id, accountId ?? '', { error: err.message, stack: err.stack });
         res.status(400).json({ message: err.message });
     }
 };
