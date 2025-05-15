@@ -5,6 +5,7 @@ import { decryptValue } from "../utils/cryptoHooks";
 import moment from "moment";
 import { isAdmin } from "../utils/isAdmin";
 import { Op } from "sequelize";
+import { createAccountErrorProcess, renewAccountErrorProcess } from "./webhookController";
 
 const { Account, User, BotExecution, Service } = db;
 const { URL_BOTS, IPTV_DISCOUNT } = process.env;
@@ -50,49 +51,26 @@ export const createIptvPremiunAccount = async (req: PersonalRequest, res: Respon
         userId,
         createdInStore: true
     });
-    const body = JSON.stringify({ ...req.body, password: pass });
+    const body = ({ ...req.body, password: pass });
+    const bodyString = JSON.stringify(body);
     const newBotExecution = await BotExecution.create({
         userId,
         status: "PROCESO",
         accountId: newAccount.id,
-        params: { body }
+        params: { body: bodyString }
     })
+    body.executionId = newBotExecution.id
     try {
-        const request = await fetch(`${URL_BOTS}/iptvPremiun`, {
+        await fetch(`${URL_BOTS}/iptvPremiun`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body
+            body: JSON.stringify(body)
         })
-        const response = await request.json()
-        if (request.ok) {
-            if (!demo) {
-                await User.update({
-                    balance: userData.balance - (price - (price * discount / 100))
-                }, { where: { id: userId } });
-            }
-            await Account.update({
-                status: "ACTIVA",
-                expiration: moment(response?.exp).format('YYYY-MM-DD')
-            }, { where: { id: newAccount.id } });
-            await BotExecution.update({
-                status: "CREADA",
-                response
-            }, { where: { id: newBotExecution.id } });
-            res.status(200).json(response);
-        } else {
-            throw new Error(response.message)
-        }
+        res.status(200).json({ message: 'Bot lanzado correctamente' });
     } catch (err: any) {
-        await BotExecution.update({
-            status: "ERROR",
-            response: { response: { message: err.message, stack: err.stack } }
-        }, { where: { id: newBotExecution.id } });
-        await Account.update({
-            status: "ERROR",
-            deleted_at: moment().format('YYYY-MM-DD HH:mm:ss')
-        }, { where: { id: newAccount.id } });
+        await createAccountErrorProcess(newBotExecution.id, newAccount.id ?? '', { response: { message: err.message, stack: err.stack } });
         res.status(400).json({ message: err.message });
     }
 };
@@ -118,52 +96,30 @@ export const renewIptvPremiunAccount = async (req: PersonalRequest, res: Respons
     }
     const accountId = decryptValue(account_id)
     const account = await Account.findByPk(accountId);
-    const body = JSON.stringify({ username: account?.email, months, demo });
+    const body: any = { username: account?.email, months, demo };
+    const bodyString = JSON.stringify(body);
     const newBotExecution = await BotExecution.create({
         userId,
         status: "PROCESO",
         accountId,
-        params: { body }
+        params: { body: bodyString }
     })
+    body.executionId = newBotExecution.id;
     try {
         await Account.update({
             status: "RENOVANDO",
         }, { where: { id: accountId } })
         if (!account) throw new Error('Cuenta no encontrada');
-        const request = await fetch(`${URL_BOTS}/iptvPremiun/renew`, {
+        await fetch(`${URL_BOTS}/iptvPremiun/renew`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body
-        })
-        const response = await request.json()
-        if (request.ok) {
-            if (!demo) {
-                await User.update({
-                    balance: userData.balance - (price - (price * discount / 100))
-                }, { where: { id: userId } });
-            }
-            await Account.update({
-                status: "ACTIVA",
-                expiration: moment(response?.exp).format('YYYY-MM-DD')
-            }, { where: { id: accountId } });
-            await BotExecution.update({
-                status: "RENOVADA",
-                response
-            }, { where: { id: newBotExecution.id } });
-            res.status(200).json(response);
-        } else {
-            throw new Error(response.error || response.message)
-        }
+            body: JSON.stringify(body)
+        });
+        res.status(200).json({ message: 'Bot lanzado correctamente' });
     } catch (err: any) {
-        await BotExecution.update({
-            status: "ERROR",
-            response: { message: err.message, stack: err.stack }
-        }, { where: { id: newBotExecution.id } });
-        await Account.update({
-            status: "ERROR",
-        }, { where: { id: accountId } });
+        await renewAccountErrorProcess(newBotExecution.id, accountId ?? '', { response: { message: err.message, stack: err.stack } });
         res.status(400).json({ message: err.message });
     }
 };

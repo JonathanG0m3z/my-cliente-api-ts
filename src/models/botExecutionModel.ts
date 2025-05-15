@@ -18,8 +18,8 @@ export default (sequelize: Sequelize) => {
     class BotExecution extends Model<BotExecutionAttributes, BotExecutionCreationAttributes> implements BotExecutionAttributes {
         public id!: string;
         public status!: string;
-        public response!: object | null;
-        public params?: object | null;
+        public response!: any | null;
+        public params?: any | null;
         public accountId!: string | null;
         public userId!: string;
 

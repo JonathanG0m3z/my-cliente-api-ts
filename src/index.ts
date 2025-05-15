@@ -10,6 +10,7 @@ import sharedBoardRouter from './routes/sharedBoardRouter';
 import accountRouter from './routes/accountRouter';
 import saleRouter from './routes/saleRouter';
 import botRouter from './routes/botRouter';
+import webhookRouter from './routes/webhookRouter';
 import { initCronJobs } from './config/cronJobs';
 import { transporter } from './config/mailer';
 
@@ -36,6 +37,7 @@ app.use('/sharedBoards', sharedBoardRouter);
 app.use('/accounts', accountRouter);
 app.use('/sales', saleRouter);
 app.use('/bots', botRouter);
+app.use('/webhook', webhookRouter);
 
 app.use(express.json());
 
