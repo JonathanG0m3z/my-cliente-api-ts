@@ -17,7 +17,7 @@ const iptvPremiunPriceByMonths: { [key: number]: number } = {
 export const createAccountErrorProcess = async (executionId: string, accountId: string, response: any) => {
     await BotExecution.update({
         status: "ERROR",
-        response: { response: { message: response } }
+        response
     }, { where: { id: executionId } });
     await Account.update({
         status: "ERROR",
@@ -28,7 +28,7 @@ export const createAccountErrorProcess = async (executionId: string, accountId: 
 export const renewAccountErrorProcess = async (executionId: string, accountId: string, response: any) => {
     await BotExecution.update({
         status: "ERROR",
-        response: { response: { message: response } }
+        response
     }, { where: { id: executionId } });
     await Account.update({
         status: "ERROR",
