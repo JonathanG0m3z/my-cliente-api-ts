@@ -29,7 +29,7 @@ export const getAccounts = async (req: PersonalRequest, res: Response) => {
                 deleted_at: { [Op.is]: null }
             }
         });
-        const myBoradsIds =boards.map((board) => board.dataValues.id);
+        const myBoardsIds = boards.map((board) => board.dataValues.id);
 
         const accounts = await Account.findAndCountAll({
             where: {
@@ -37,7 +37,7 @@ export const getAccounts = async (req: PersonalRequest, res: Response) => {
                     { userId: userId },
                     {
                         sharedBoardId: {
-                            [Op.in]: myBoradsIds
+                            [Op.in]: myBoardsIds
                         }
                     }
                 ],
@@ -117,13 +117,13 @@ export const getAccountsCombo = async (req: PersonalRequest, res: Response) => {
                 deleted_at: { [Op.is]: null }
             }
         });
-        const myBoradsIds =boards.map((board) => board.dataValues.id);
+        const myBoardsIds = boards.map((board) => board.dataValues.id);
         const whereCondition: any = {
             [Op.or]: [
                 { userId: userId },
                 {
                     sharedBoardId: {
-                        [Op.in]: myBoradsIds
+                        [Op.in]: myBoardsIds
                     }
                 }
             ],
