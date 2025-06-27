@@ -231,7 +231,7 @@ const deleteSale = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const { userId } = req;
         const { id } = req.params;
         const isValid = yield Sale.findAll({ where: { userId, id } });
-        if (!isValid)
+        if (isValid.length === 0)
             throw Error("No se encontró el ID de la venta");
         yield Sale.destroy({ where: { userId, id } });
         res.status(200).json({ message: "Venta eliminada con exito" });

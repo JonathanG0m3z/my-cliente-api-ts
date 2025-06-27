@@ -223,7 +223,7 @@ export const deleteSale = async (req: PersonalRequest, res: Response) => {
         const { userId } = req;
         const { id } = req.params;
         const isValid = await Sale.findAll({ where: { userId, id } });
-        if (!isValid) throw Error("No se encontró el ID de la venta");
+        if (isValid.length === 0) throw Error("No se encontró el ID de la venta");
         await Sale.destroy({ where: { userId, id } });
         res.status(200).json({ message: "Venta eliminada con exito" });
     } catch (err: any) {
