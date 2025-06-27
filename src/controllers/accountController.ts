@@ -10,9 +10,9 @@ const { Sale, Account, Service, SharedBoard } = db;
 export const getAccounts = async (req: PersonalRequest, res: Response) => {
     try {
         const { userId, email } = req;
-        const currentDate = moment().subtract(5, 'days').format('YYYY-MM-DD'); // Obtener la fecha actual
-        const { page = 1, limit = 10 } = req.query; // Establecer valores predeterminados para la página y el límite
-        const offset = (Number(page) - 1) * Number(limit); // Calcular el desplazamiento basado en la página y el límite
+        const { page = 1, limit = 10, search = '', is_deleted, end_date, begin_date, service } = req.query as any;
+        const order = req.query.order as any;
+        const offset = (Number(page) - 1) * Number(limit);
 
         const boards = await SharedBoard.findAll({
             where: {
@@ -31,26 +31,69 @@ export const getAccounts = async (req: PersonalRequest, res: Response) => {
         });
         const myBoardsIds = boards.map((board) => board.dataValues.id);
 
-        const accounts = await Account.findAndCountAll({
-            where: {
-                [Op.or]: [
-                    { userId: userId },
-                    {
-                        sharedBoardId: {
-                            [Op.in]: myBoardsIds
-                        }
+        let whereClause: any = {
+            [Op.or]: [
+                { userId: userId },
+                {
+                    sharedBoardId: {
+                        [Op.in]: myBoardsIds
                     }
-                ],
-                expiration: { [Op.gte]: currentDate },
-                deleted_at: { [Op.is]: null }
-            },
+                }
+            ],
+            [Op.and]: [
+                {
+                    [Op.or]: [
+                        { email: { [Op.iLike]: `%${search}%` } },
+                        { password: { [Op.iLike]: `%${search}%` } }
+                    ]
+                }
+            ]
+        };
+
+        if (is_deleted === 'true') {
+            whereClause[Op.and].push({ deleted_at: { [Op.not]: null } });
+        } else if (is_deleted === 'false') {
+            whereClause[Op.and].push({ deleted_at: null });
+        }
+
+        if (end_date && begin_date) {
+            whereClause[Op.and].push({
+                expiration: {
+                    [Op.between]: [begin_date, end_date]
+                }
+            });
+        } else if (end_date) {
+            whereClause[Op.and].push({
+                expiration: {
+                    [Op.lte]: end_date
+                }
+            });
+        } else if (begin_date) {
+            whereClause[Op.and].push({
+                expiration: {
+                    [Op.gte]: begin_date
+                }
+            });
+        }
+
+        if (service && typeof service === 'string') {
+            const services = service.split(',');
+            whereClause[Op.and].push({
+                serviceId: {
+                    [Op.in]: services
+                }
+            });
+        }
+
+        const accounts = await Account.findAndCountAll({
+            where: whereClause,
             include: [
                 {
                     model: Service,
                     attributes: ['name']
                 }
             ],
-            order: [['expiration', 'ASC']],
+            order: [...(order === '' || order === undefined) ? [] : [order.split(' ')]],
             limit: Number(limit),
             offset: Number(offset)
         });
