@@ -62,8 +62,9 @@ export const createAccountWebhook = async (req: Request, res: Response) => {
         const price = iptvPremiunPriceByMonths[JSON.parse(execution.params?.body ?? '{}')?.months];
         if (success) {
             if (!demo) {
+                const newBalance = Number(((execution.user?.balance ?? 0) - (price - (price * discount / 100))).toFixed(2));
                 await User.update({
-                    balance: execution.user?.balance - (price - (price * discount / 100))
+                    balance: newBalance
                 }, { where: { id: execution.userId } });
             }
             await Account.update({
@@ -114,8 +115,9 @@ export const renewAccountWebhook = async (req: Request, res: Response) => {
         const price = iptvPremiunPriceByMonths[JSON.parse(execution.params?.body ?? '{}')?.months];
         if (success) {
             if (!demo) {
+                const newBalance = Number(((execution.user?.balance ?? 0) - (price - (price * discount / 100))).toFixed(2));
                 await User.update({
-                    balance: execution.user?.balance - (price - (price * discount / 100))
+                    balance: newBalance
                 }, { where: { id: execution.userId } });
             }
             await Account.update({
