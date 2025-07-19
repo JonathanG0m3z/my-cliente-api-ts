@@ -1,8 +1,7 @@
 import cron from 'node-cron';
 import { logger } from '../utils/logger';
 
-const { URL_BOTS } = process.env;
-const DEPLOY_HOOK_URL = 'https://api.render.com/deploy/srv-cq3bt52ju9rs739btlq0?key=m9c7TXJFCcM';
+const { URL_BOTS, DEPLOY_HOOK_URL = "" } = process.env;
 const MAX_CONSECUTIVE_FAILURES = 10;
 const PING_TIMEOUT = 15000; // 15 segundos
 
